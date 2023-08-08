@@ -1,35 +1,9 @@
 import { StyledForm, StyledHeading, StyledLabel } from "./ProductForm.styled";
 import { StyledButton } from "../Button/Button.styled";
-import useSWR from "swr";
 
-export default function ProductForm() {
-  const { mutate } = useSWR("/api/products");
-
-  async function handleSubmit(event) {
-    event.preventDefault();
-
-    const formData = new FormData(event.target);
-    const productData = Object.fromEntries(formData);
-
-    const response = await fetch("/api/products", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(productData),
-    });
-
-    if (!response.ok) {
-      console.error(response.status);
-      return;
-    }
-
-    mutate();
-    event.target.reset();
-  }
-
+export default function ProductForm({ onSubmit }) {
   return (
-    <StyledForm onSubmit={handleSubmit}>
+    <StyledForm onSubmit={onSubmit}>
       <StyledHeading>Add a new Fish</StyledHeading>
       <StyledLabel htmlFor="name">
         Name:
@@ -55,3 +29,23 @@ export default function ProductForm() {
     </StyledForm>
   );
 }
+
+/* 
+Switch to `./components/ProductForm/index.js`.
+
+Lift up all logic regarding the creating of the `productData` to the `./pages/index.js` file.
+
+> 💡 This includes the destructuring of `const { mutate } = useSWR("/api/products");`, the `handleSubmit` function and the import of `useSWR`.
+
+After doing so,
+
+- rename the `handleSubmit` function to `handleAddProduct`
+- in the return statement, pass `handleAddProduct` to the `ProductForm` component as a prop called `onSubmit`.
+
+Switch back to `./components/ProductForm/index.js` and
+
+- receive the `onSubmit` prop.
+- use `onSubmit` instead of `handleSubmit` in the form
+
+> 💡 Bonus: Pass another new prop to the `ProductForm` component to set the heading of the form dynamically ("Add a new Fish" is not a proper headline when updating the product, right?).
+ */
